@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom';
+import { useLangStore } from '../store';
+import { t } from '../utils/i18n';
 
 export default function Footer() {
+  const { lang } = useLangStore();
+  const l = lang || 'fr';
+
   return (
     <footer style={{
       background: 'var(--navy)',
@@ -24,31 +29,31 @@ export default function Footer() {
               PRÊT RAPIDE
             </h3>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-              Votre solution de prêt rapide et fiable. Obtenez votre financement en 24h, sans paperasse.
+              {t('footer_desc', l)}
             </p>
           </div>
           <div>
             <h4 style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginBottom: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              Pages
+              {t('footer_pages', l)}
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
-                { to: '/', label: 'Accueil' },
-                { to: '/comment-ca-marche', label: 'Comment ça marche' },
-                { to: '/faq', label: 'FAQ' },
-                { to: '/demande', label: 'Faire une demande' },
-              ].map(l => (
-                <Link key={l.to} to={l.to} style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: 13, transition: 'color 0.2s', padding: '2px 0' }}
+                { to: '/', label: t('nav_home', l) },
+                { to: '/comment-ca-marche', label: t('nav_how', l) },
+                { to: '/faq', label: t('nav_faq', l) },
+                { to: '/demande', label: t('nav_apply', l) },
+              ].map(item => (
+                <Link key={item.to} to={item.to} style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: 13, transition: 'color 0.2s', padding: '2px 0' }}
                   onMouseOver={e => e.currentTarget.style.color = 'var(--gold)'}
                   onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
-                  {l.label}
+                  {item.label}
                 </Link>
               ))}
             </div>
           </div>
           <div>
             <h4 style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginBottom: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              Contact
+              {t('footer_contact', l)}
             </h4>
             <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 6 }}>
               <p>📍 Milan, Italie</p>
@@ -66,7 +71,7 @@ export default function Footer() {
         fontSize: 11,
         color: 'rgba(255,255,255,0.35)',
       }}>
-        © {new Date().getFullYear()} Prêt Rapide. Tous droits réservés.
+        © {new Date().getFullYear()} Prêt Rapide. {t('footer_rights', l)}
       </div>
     </footer>
   );

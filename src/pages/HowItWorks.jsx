@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useLangStore } from '../store';
+import { t } from '../utils/i18n';
 
 export default function HowItWorks() {
+  const { lang } = useLangStore();
+  const l = lang || 'fr';
+
   const fadeUp = {
     initial: { opacity: 0, y: 32 },
     whileInView: { opacity: 1, y: 0 },
@@ -12,21 +17,21 @@ export default function HowItWorks() {
   const steps = [
     {
       icon: '📝', number: '1',
-      title: 'Remplissez le formulaire',
-      desc: 'Indiquez vos informations personnelles, professionnelles et le montant souhaité. Le processus prend moins de 5 minutes et est accessible 24h/24.',
-      details: ['Formulaire 100% en ligne', 'Aucun document à fournir', 'Processus guidé étape par étape'],
+      title: t('how_step1_title', l),
+      desc: t('how_step1_desc', l),
+      details: [t('how_step1_d1', l), t('how_step1_d2', l), t('how_step1_d3', l)],
     },
     {
       icon: '🔍', number: '2',
-      title: 'Validation de votre dossier',
-      desc: 'Notre équipe analyse votre demande rapidement. Grâce à notre système automatisé, vous recevez une réponse sous 24h maximum.',
-      details: ['Analyse automatisée et humaine', 'Réponse sous 24h', 'Aucun impact sur votre crédit'],
+      title: t('how_step2_title', l),
+      desc: t('how_step2_desc', l),
+      details: [t('how_step2_d1', l), t('how_step2_d2', l), t('how_step2_d3', l)],
     },
     {
       icon: '💰', number: '3',
-      title: 'Réception des fonds',
-      desc: 'Une fois votre prêt approuvé, les fonds sont transférés directement sur votre compte bancaire. Simple et rapide.',
-      details: ['Virement bancaire direct', 'Réception sous 24h après approbation', 'Suivi en temps réel'],
+      title: t('how_step3_title', l),
+      desc: t('how_step3_desc', l),
+      details: [t('how_step3_d1', l), t('how_step3_d2', l), t('how_step3_d3', l)],
     },
   ];
 
@@ -40,9 +45,9 @@ export default function HowItWorks() {
         <div className="noise" style={{ position:'absolute', inset:0 }} />
         <div style={{ position:'absolute', top:'-15%', right:'-8%', width:400, height:400, borderRadius:'50%', background:'radial-gradient(circle, rgba(245,166,35,0.08) 0%, transparent 70%)' }} />
         <motion.div initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.6, ease:[0.16,1,0.3,1] }} style={{ position:'relative', zIndex:1 }}>
-          <span className="section-eyebrow" style={{ color:'var(--gold)' }}>Processus</span>
-          <h1 className="hero-text" style={{ fontSize:'clamp(32px,5vw,52px)', marginBottom:12 }}>Comment ça marche ?</h1>
-          <p className="hero-sub" style={{ fontSize:15, lineHeight:1.65 }}>Obtenez votre prêt en 3 étapes simples. Transparent, rapide et sans tracas.</p>
+          <span className="section-eyebrow" style={{ color:'var(--gold)' }}>{t('process_label', l)}</span>
+          <h1 className="hero-text" style={{ fontSize:'clamp(32px,5vw,52px)', marginBottom:12 }}>{t('how_title', l)}</h1>
+          <p className="hero-sub" style={{ fontSize:15, lineHeight:1.65 }}>{t('how_sub', l)}</p>
         </motion.div>
       </section>
 
@@ -79,9 +84,9 @@ export default function HowItWorks() {
 
       <section style={{ padding:'60px 6%', textAlign:'center', background:'var(--bg-card2)' }}>
         <motion.div {...fadeUp} style={{ maxWidth:480, margin:'0 auto' }}>
-          <h2 style={{ fontFamily:"'Outfit',sans-serif", fontSize:'clamp(24px,3.5vw,36px)', fontWeight:900, marginBottom:12 }}>Prêt à commencer ?</h2>
-          <p style={{ fontSize:14, color:'var(--text-3)', marginBottom:28 }}>Faites votre demande dès maintenant et recevez une réponse sous 24h.</p>
-          <Link to="/demande" className="btn-primary" style={{ fontSize:14, padding:'16px 40px', textDecoration:'none' }}>Faire une demande →</Link>
+          <h2 style={{ fontFamily:"'Outfit',sans-serif", fontSize:'clamp(24px,3.5vw,36px)', fontWeight:900, marginBottom:12 }}>{t('how_cta_title', l)}</h2>
+          <p style={{ fontSize:14, color:'var(--text-3)', marginBottom:28 }}>{t('how_cta_desc', l)}</p>
+          <Link to="/demande" className="btn-primary" style={{ fontSize:14, padding:'16px 40px', textDecoration:'none' }}>{t('how_cta_btn', l)}</Link>
         </motion.div>
       </section>
     </>

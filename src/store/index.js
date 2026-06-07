@@ -17,6 +17,18 @@ export const useThemeStore = create((set) => ({
   },
 }));
 
+const savedLang = localStorage.getItem('pr_lang') || 'fr';
+document.documentElement.lang = savedLang;
+
+export const useLangStore = create((set) => ({
+  lang: savedLang,
+  setLang: (lang) => {
+    localStorage.setItem('pr_lang', lang);
+    document.documentElement.lang = lang;
+    set({ lang });
+  },
+}));
+
 let toastId = 0;
 export const useToastStore = create((set, get) => ({
   toasts: [],

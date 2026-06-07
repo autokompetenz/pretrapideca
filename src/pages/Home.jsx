@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useLangStore } from '../store';
+import { t } from '../utils/i18n';
 
 function CountUp({ end, suffix = '', duration = 2000 }) {
   const [count, setCount] = useState(0);
@@ -17,6 +19,8 @@ function CountUp({ end, suffix = '', duration = 2000 }) {
 }
 
 export default function Home() {
+  const { lang } = useLangStore();
+  const l = lang || 'fr';
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 80]);
   const opacity = useTransform(scrollY, [0, 400], [1, 0.6]);
@@ -30,12 +34,10 @@ export default function Home() {
 
   return (
     <>
-      {/* ══ HERO — PARALLAX ══ */}
       <section style={{
         position: 'relative', minHeight: '100vh', overflow: 'hidden',
         display: 'flex', alignItems: 'center',
       }}>
-        {/* Background avec effet parallaxe */}
         <motion.div style={{ y, position: 'absolute', inset: 0 }}>
           <div style={{
             position: 'absolute', inset: 0,
@@ -45,13 +47,11 @@ export default function Home() {
           }} />
         </motion.div>
 
-        {/* Overlay gradient */}
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(135deg, rgba(10,31,68,0.92) 0%, rgba(6,18,50,0.55) 60%, rgba(26,58,110,0.35) 100%)',
         }} />
 
-        {/* Decorative circles */}
         <div style={{
           position: 'absolute', top: '-20%', right: '-10%',
           width: 'min(500px, 70vw)', height: 'min(500px, 70vw)',
@@ -79,7 +79,7 @@ export default function Home() {
                 marginBottom: 20,
               }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)', display: 'inline-block' }} />
-                Simple · Rapide · Fiable
+                {t('hero_badge', l)}
               </span>
             </motion.div>
 
@@ -90,7 +90,7 @@ export default function Home() {
               className="hero-text"
               style={{ fontSize: 'clamp(44px, 6vw, 72px)', marginBottom: 16, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1 }}
             >
-              Obtenez votre <span style={{ color: 'var(--gold)' }}>prêt en 24h</span>
+              Obtenez votre <span style={{ color: 'var(--gold)' }}>{t('hero_title_hl', l)}</span>
             </motion.h1>
 
             <motion.p
@@ -100,7 +100,7 @@ export default function Home() {
               className="hero-sub"
               style={{ fontSize: 17, lineHeight: 1.65, marginBottom: 36, maxWidth: 480 }}
             >
-              Financement rapide sans paperasse. Découvrez votre éligibilité en quelques minutes et recevez votre argent sous 24h.
+              {t('hero_sub', l)}
             </motion.p>
 
             <motion.div
@@ -110,18 +110,17 @@ export default function Home() {
               style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}
             >
               <Link to="/demande" className="btn-gold" style={{ fontSize: 14, padding: '16px 38px', textDecoration: 'none' }}>
-                Faire une demande →
+                {t('hero_cta', l)}
               </Link>
               <Link to="/comment-ca-marche" className="btn-ghost" style={{
                 borderColor: 'rgba(255,255,255,0.25)', color: '#fff', textDecoration: 'none',
               }}>
-                Comment ça marche
+                {t('hero_cta2', l)}
               </Link>
             </motion.div>
           </div>
         </motion.div>
 
-        {/* Stats bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -138,10 +137,10 @@ export default function Home() {
             padding: '16px 5%', gap: 12,
           }}>
             {[
-              { end: 10, suffix: '+ ans', label: "D'expérience" },
-              { end: 15000, suffix: '+', label: 'Clients' },
-              { end: 98, suffix: '%', label: 'Satisfaits' },
-              { end: 50, suffix: 'M$', label: 'Débloqués' },
+              { end: 10, suffix: '+ ans', label: t('stat_exp', l) },
+              { end: 15000, suffix: '+', label: t('stat_clients', l) },
+              { end: 98, suffix: '%', label: t('stat_satisfied', l) },
+              { end: 50, suffix: 'M$', label: t('stat_unlocked', l) },
             ].map((s, i) => (
               <motion.div key={i}
                 initial={{ opacity: 0, y: 12 }}
@@ -165,25 +164,24 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ══ TRUST BADGES ══ */}
       <section style={{ padding: '80px 6%', background: 'var(--bg-card2)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <motion.div {...fadeUp} style={{ textAlign: 'center', marginBottom: 44 }}>
-            <span className="section-eyebrow">Pourquoi nous choisir</span>
+            <span className="section-eyebrow">{t('why_title', l)}</span>
             <h2 style={{ fontFamily: "'Outfit',sans-serif", fontSize: 'clamp(28px,4vw,44px)', fontWeight: 900, marginBottom: 12 }}>
-              Des services pensés pour vous
+              {t('why_heading', l)}
             </h2>
             <p style={{ fontSize: 15, color: 'var(--text-3)', maxWidth: 480, margin: '0 auto' }}>
-              Un accompagnement sur mesure pour chaque demande
+              {t('why_sub', l)}
             </p>
           </motion.div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
             {[
-              { icon: '🔒', title: 'Paiement sécurisé', desc: 'Données cryptées et protégées selon les normes les plus strictes.' },
-              { icon: '⚡', title: 'Rapide et efficace', desc: 'Réponse sous 24h maximum. Un processus 100% en ligne.' },
-              { icon: '📄', title: 'Sans paperasse', desc: 'Zéro document à fournir. Simple et dématérialisé.' },
-              { icon: '🤝', title: 'Conseiller dédié', desc: 'Un interlocuteur unique pour vous accompagner.' },
+              { icon: '🔒', title: t('badge1_title', l), desc: t('badge1_desc', l) },
+              { icon: '⚡', title: t('badge2_title', l), desc: t('badge2_desc', l) },
+              { icon: '📄', title: t('badge3_title', l), desc: t('badge3_desc', l) },
+              { icon: '🤝', title: t('badge4_title', l), desc: t('badge4_desc', l) },
             ].map((b, i) => (
               <motion.div key={i} {...fadeUp} transition={{ duration: 0.55, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                 className="card"
@@ -198,24 +196,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ HOW IT WORKS ══ */}
       <section style={{ padding: '80px 6%', background: 'var(--bg)' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <motion.div {...fadeUp} style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span className="section-eyebrow">Processus</span>
+            <span className="section-eyebrow">{t('process_label', l)}</span>
             <h2 style={{ fontFamily: "'Outfit',sans-serif", fontSize: 'clamp(28px,4vw,44px)', fontWeight: 900, marginBottom: 12 }}>
-              Comment ça marche ?
+              {t('process_heading', l)}
             </h2>
             <p style={{ fontSize: 15, color: 'var(--text-3)', maxWidth: 400, margin: '0 auto' }}>
-              Obtenez votre prêt en 3 étapes simples
+              {t('process_sub', l)}
             </p>
           </motion.div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
             {[
-              { step: '01', title: 'Remplissez le formulaire', desc: 'Indiquez vos informations personnelles et professionnelles en quelques minutes.', icon: '📝' },
-              { step: '02', title: 'Validation rapide', desc: 'Notre équipe analyse votre demande et vous répond sous 24h maximum.', icon: '✅' },
-              { step: '03', title: 'Réception des fonds', desc: 'Une fois approuvé, recevez l\'argent directement sur votre compte bancaire.', icon: '💰' },
+              { step: '01', title: t('step1_title', l), desc: t('step1_desc', l), icon: '📝' },
+              { step: '02', title: t('step2_title', l), desc: t('step2_desc', l), icon: '✅' },
+              { step: '03', title: t('step3_title', l), desc: t('step3_desc', l), icon: '💰' },
             ].map((item, i) => (
               <motion.div key={i} {...fadeUp} transition={{ duration: 0.55, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 style={{
@@ -246,7 +243,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ STATS ══ */}
       <section style={{
         padding: '80px 6%',
         background: 'var(--navy)', position: 'relative', overflow: 'hidden',
@@ -258,10 +254,10 @@ export default function Home() {
           gap: 32, maxWidth: 1100, margin: '0 auto', textAlign: 'center',
         }}>
           {[
-            { end: 15000, suffix: '+', label: 'Clients satisfaits' },
-            { end: 50, suffix: 'M$', label: 'Montants débloqués' },
-            { end: 24, suffix: 'h', label: 'Délai de réponse' },
-            { end: 98, suffix: '%', label: 'Taux de satisfaction' },
+            { end: 15000, suffix: '+', label: t('stat_client', l) },
+            { end: 50, suffix: 'M$', label: t('stat_amount', l) },
+            { end: 24, suffix: 'h', label: t('stat_delay', l) },
+            { end: 98, suffix: '%', label: t('stat_rate', l) },
           ].map((s, i) => (
             <motion.div key={i} {...fadeUp} transition={{ duration: 0.55, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}>
               <div style={{
@@ -279,17 +275,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ CTA ══ */}
       <section style={{ padding: '80px 6%', textAlign: 'center', background: 'var(--bg)' }}>
         <motion.div {...fadeUp} style={{ maxWidth: 520, margin: '0 auto' }}>
           <h2 style={{ fontFamily: "'Outfit',sans-serif", fontSize: 'clamp(28px,4vw,42px)', fontWeight: 900, marginBottom: 14 }}>
-            Prêt à obtenir votre prêt ?
+            {t('cta_title', l)}
           </h2>
           <p style={{ fontSize: 15, color: 'var(--text-3)', marginBottom: 32, lineHeight: 1.6 }}>
-            Rejoignez plus de 15 000 clients satisfaits. Faites votre demande en 2 minutes chrono.
+            {t('cta_desc', l)}
           </p>
           <Link to="/demande" className="btn-primary" style={{ fontSize: 14, padding: '16px 40px', textDecoration: 'none' }}>
-            Faire une demande →
+            {t('cta_btn', l)}
           </Link>
         </motion.div>
       </section>

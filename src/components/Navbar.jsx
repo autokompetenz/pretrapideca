@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useThemeStore } from '../store';
+import { useThemeStore, useLangStore } from '../store';
 import { useBreakpoint } from '../hooks/useBreakpoint';
+import { t, LANGUAGES } from '../utils/i18n';
 
 export default function Navbar() {
   const { theme, toggle } = useThemeStore();
+  const { lang, setLang } = useLangStore();
+  const l = lang || 'fr';
   const location = useLocation();
   const { isMobile } = useBreakpoint();
   const [scrolled, setScrolled] = useState(false);
@@ -114,24 +117,24 @@ export default function Navbar() {
             PRÊT RAPIDE
           </div>
           <div style={{ fontSize: 9, letterSpacing: '0.4em', color: 'var(--gold)', textTransform: 'uppercase', marginTop: 2 }}>
-            Votre prêt en 24h
+            {t('tagline', l)}
           </div>
         </Link>
 
-        {!isMobile && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 28, position: 'relative', zIndex: 1 }}>
-            <NavLink to="/" label="Accueil" />
-            <NavLink to="/comment-ca-marche" label="Comment ça marche" />
-            <NavLink to="/faq" label="FAQ" />
-          </div>
-        )}
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative', zIndex: 1 }}>
           {!isMobile && (
-            <Link to="/demande" className="btn-gold" style={{ fontSize: 11, padding: '9px 18px', letterSpacing: '0.12em', textDecoration: 'none' }}>
-              Faire une demande
-            </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 28, position: 'relative', zIndex: 1 }}>
+              <NavLink to="/" label={t('nav_home', l)} />
+              <NavLink to="/comment-ca-marche" label={t('nav_how', l)} />
+              <NavLink to="/faq" label={t('nav_faq', l)} />
+            </div>
           )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative', zIndex: 1 }}>
+            {!isMobile && (
+              <Link to="/demande" className="btn-gold" style={{ fontSize: 11, padding: '9px 18px', letterSpacing: '0.12em', textDecoration: 'none' }}>
+                {t('nav_apply', l)}
+              </Link>
+            )}
 
           <div style={{ position: 'relative' }} ref={menuRef}>
             <button
@@ -152,7 +155,7 @@ export default function Navbar() {
                 </span>
               ) : (
                 <>
-                  <span style={{ fontSize: 14, color: iconColor, fontWeight: 600, fontFamily: F }}>Menu</span>
+                  <span style={{ fontSize: 14, color: iconColor, fontWeight: 600, fontFamily: F }}>{t('nav_menu', l)}</span>
                   <span style={{ fontSize: 10, color: iconColor, opacity: 0.6 }}>▾</span>
                 </>
               )}
@@ -183,9 +186,9 @@ export default function Navbar() {
                   {isMobile && (
                     <div style={{ marginBottom: 20 }}>
                       {[
-                        { to: '/', label: 'Accueil' },
-                        { to: '/comment-ca-marche', label: 'Comment ça marche' },
-                        { to: '/faq', label: 'FAQ' },
+                        { to: '/', label: t('nav_home', l) },
+                        { to: '/comment-ca-marche', label: t('nav_how', l) },
+                        { to: '/faq', label: t('nav_faq', l) },
                       ].map(({ to, label }) => (
                         <Link key={to} to={to} onClick={() => setMenuOpen(false)}
                           style={{
@@ -213,7 +216,7 @@ export default function Navbar() {
                       onMouseOver={e => { if (!isMobile) e.currentTarget.style.background = 'rgba(245,166,35,0.06)'; }}
                       onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
                       <span style={{ fontSize: isMobile ? 20 : 16, width: isMobile ? 28 : 20, textAlign: 'center' }}>✦</span>
-                      Faire une demande
+                      {t('nav_apply', l)}
                     </Link>
                   </div>
 
@@ -226,8 +229,39 @@ export default function Navbar() {
                       <span style={{ fontSize: isMobile ? 20 : 16, width: isMobile ? 28 : 20, textAlign: 'center' }}>
                         {isDark ? '☀️' : '🌙'}
                       </span>
-                      {isDark ? 'Mode clair' : 'Mode sombre'}
+                      {isDark ? t('theme_light', l) : t('theme_dark', l)}
                     </button>
+                  </div>
+
+                  <div style={{ height: 1, background: menuBorder, margin: isMobile ? '8px 0' : 0 }} />
+
+                  <div style={{ padding: isMobile ? '8px 0' : '6px 0' }}>
+                    <p style={{
+                      fontSize: 10, fontWeight: 800, letterSpacing: '0.25em',
+                      textTransform: 'uppercase', color: menuText3,
+                      padding: isMobile ? '4px 0 10px' : '4px 18px 8px',
+                      margin: 0,
+                    }}>
+                      {t('language', l)}
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 8 : 4, padding: isMobile ? 0 : '0 10px 6px' }}>
+                      {LANGUAGES.map(ln => (
+                        <button key={ln.code} onClick={() => { setLang(ln.code); setMenuOpen(false); }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 7,
+                            padding: isMobile ? '10px 6px' : '8px 10px',
+                            background: ln.code === l ? 'rgba(245,166,35,0.1)' : 'transparent',
+                            border: `1px solid ${ln.code === l ? 'rgba(245,166,35,0.3)' : 'transparent'}`,
+                            borderRadius: 6, cursor: 'pointer',
+                            fontSize: isMobile ? 14 : 13,
+                            color: ln.code === l ? 'var(--gold)' : menuText2,
+                            fontFamily: F, fontWeight: ln.code === l ? 700 : 400,
+                            transition: 'all 0.15s',
+                          }}>
+                          <span style={{ fontSize: isMobile ? 18 : 16 }}>{ln.flag}</span> {ln.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
               )}
