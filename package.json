@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "framer-motion": "^10.16.16",
+    "nodemailer": "^8.0.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.0",

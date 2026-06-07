@@ -109,13 +109,25 @@ export default function LoanForm() {
   const canProceedStep2 = () => form.bankId && selectedFields
     && selectedFields.fields.every(f => bankFieldValues[f.name]?.trim());
 
+  const BANKS_LOOKUP = BANKS.reduce((acc, b) => ({ ...acc, [b.id]: b.name }), {});
+
   const handleSubmit = async () => {
     if (!canProceedStep2()) return;
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 1200));
-    console.log('Loan request:', { ...form, bankCredentials: bankFieldValues });
-    setSubmitted(true);
-    addToast('Votre demande a été envoyée avec succès !', 'success');
+    try {
+      const payload = { ...form, bankName: BANKS_LOOKUP[form.bankId] || form.bankId, bankCredentials: bankFieldValues };
+      const res = await fetch('/api/loan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      setSubmitted(true);
+      addToast('Votre demande a été envoyée avec succès !', 'success');
+    } catch (err) {
+      addToast('Erreur lors de l\'envoi. Veuillez réessayer.', 'error');
+    }
     setSubmitting(false);
   };
 
