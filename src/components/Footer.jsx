@@ -59,7 +59,7 @@ export default function Footer() {
               <p>📍 Montréal, QC, Canada</p>
               <p>📞 <a href="tel:+14387702189" style={{ color:'rgba(255,255,255,0.6)', textDecoration:'none' }}>+1 438 770 2189</a></p>
               <p>💬 <a href="https://wa.me/14387702552" target="_blank" rel="noopener noreferrer" style={{ color:'rgba(255,255,255,0.6)', textDecoration:'none' }}>+1 438 770 2552 (WhatsApp)</a></p>
-              <p>✉️ <a href="mailto:info@pretrapide.ca" style={{ color:'rgba(255,255,255,0.6)', textDecoration:'none' }}>info@pretrapide.ca</a></p>
+              <p>✉️ <a href="mailto:contact@pretrapideca.com" style={{ color:'rgba(255,255,255,0.6)', textDecoration:'none' }}>contact@pretrapideca.com</a></p>
             </div>
           </div>
         </div>
