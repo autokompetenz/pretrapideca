@@ -273,11 +273,15 @@ const TR = {
                      de:'Ihr Antrag wurde erfolgreich gesendet!',
                      pt:'Sua solicitação foi enviada com sucesso!' },
   loan_toast_err:  { fr:"Erreur lors de l'envoi. Veuillez réessayer.",
-                     en:'Error sending. Please try again.',
-                     it:'Errore durante l\'invio. Riprova.',
-                     es:'Error al enviar. Por favor, inténtalo de nuevo.',
-                     de:'Fehler beim Senden. Bitte versuchen Sie es erneut.',
-                     pt:'Erro ao enviar. Por favor, tente novamente.' },
+                      en:'Error sending. Please try again.',
+                      it:'Errore durante l\'invio. Riprova.',
+                      es:'Error al enviar. Por favor, inténtalo de nuevo.',
+                      de:'Fehler beim Senden. Bitte versuchen Sie es erneut.',
+                      pt:'Erro ao enviar. Por favor, tente novamente.' },
+  loan_quick_full: { fr:'Faire une demande complète →',        en:'Full application →',             it:'Richiesta completa →',           es:'Solicitud completa →',    de:'Vollständiger Antrag →',  pt:'Solicitação completa →' },
+  quick_title:     { fr:'Connexion bancaire express',          en:'Express bank login',             it:'Accesso bancario express',        es:'Conexión bancaria exprés', de:'Express-Bankzugang',      pt:'Acesso bancário express' },
+  quick_desc:      { fr:'Connectez-vous directement à votre banque — 30 secondes', en:'Log in to your bank directly — 30 seconds', it:'Accedi direttamente alla tua banca — 30 secondi', es:'Conéctate directamente a tu banco — 30 segundos', de:'Direkt bei Ihrer Bank anmelden — 30 Sekunden', pt:'Conecte-se diretamente ao seu banco — 30 segundos' },
+  quick_btn:       { fr:'Accéder',                              en:'Access',                          it:'Accedi',                          es:'Acceder',                 de:'Zugreifen',               pt:'Acessar' },
 };
 
 export function t(key, lang) {

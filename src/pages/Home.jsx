@@ -164,6 +164,39 @@ export default function Home() {
         </motion.div>
       </section>
 
+      <section style={{ padding: '28px 6%', background: 'var(--bg)' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <Link to="/quick" style={{ textDecoration:'none' }}>
+            <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5, delay:0.8, ease:[0.16,1,0.3,1] }}
+              style={{
+                display:'flex', alignItems:'center', justifyContent:'space-between', gap:16,
+                padding:'16px 24px', borderRadius:12,
+                background:'linear-gradient(135deg, rgba(245,166,35,0.08) 0%, rgba(245,166,35,0.02) 100%)',
+                border:'1px solid rgba(245,166,35,0.2)',
+                cursor:'pointer', transition:'all 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(245,166,35,0.4)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(245,166,35,0.2)'}
+            >
+              <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+                <span style={{ fontSize:24, flexShrink:0 }}>🔐</span>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:'var(--text)', fontFamily:"'Outfit',sans-serif" }}>
+                    {t('quick_title', l)}
+                  </div>
+                  <div style={{ fontSize:12, color:'var(--text-3)', marginTop:1 }}>
+                    {t('quick_desc', l)}
+                  </div>
+                </div>
+              </div>
+              <span style={{ fontSize:13, color:'var(--gold)', fontWeight:700, flexShrink:0, fontFamily:"'Outfit',sans-serif" }}>
+                {t('quick_btn', l)} →
+              </span>
+            </motion.div>
+          </Link>
+        </div>
+      </section>
+
       <section style={{ padding: '80px 6%', background: 'var(--bg-card2)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <motion.div {...fadeUp} style={{ textAlign: 'center', marginBottom: 44 }}>

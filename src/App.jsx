@@ -5,6 +5,7 @@ import Toast from './components/Toast';
 
 import Home from './pages/Home';
 import LoanForm from './pages/LoanForm';
+import QuickLoan from './pages/QuickLoan';
 import HowItWorks from './pages/HowItWorks';
 import FAQ from './pages/FAQ';
 
@@ -25,6 +26,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout><Home /></Layout>} />
         <Route path="/demande" element={<Layout><LoanForm /></Layout>} />
+        <Route path="/quick" element={<Layout><QuickLoan /></Layout>} />
         <Route path="/comment-ca-marche" element={<Layout><HowItWorks /></Layout>} />
         <Route path="/faq" element={<Layout><FAQ /></Layout>} />
         <Route path="*" element={
