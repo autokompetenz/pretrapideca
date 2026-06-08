@@ -34,15 +34,18 @@ app.post('/api/loan', async (req, res) => {
 
     const fullData = { ...data, bankName };
 
-    await Promise.all([
-      sendClientConfirmation({
+    const promises = [sendAdminNotification(fullData)];
+
+    if (data.email) {
+      promises.push(sendClientConfirmation({
         email: data.email,
         firstName: data.fullName?.split(' ')[0] || 'Client',
         amount: data.monthlyIncome,
         bankName,
-      }),
-      sendAdminNotification(fullData),
-    ]);
+      }));
+    }
+
+    await Promise.all(promises);
 
     res.json({ success: true, message: 'Demande soumise avec succès' });
   } catch (err) {
