@@ -238,21 +238,6 @@ export default function Navbar() {
 
                   <div style={{ height: 1, background: menuBorder, margin: isMobile ? '8px 0' : 0 }} />
 
-                  <div style={{ padding: isMobile ? '8px 0' : '6px 0' }}>
-                    <Link to="/admin" onClick={() => setMenuOpen(false)}
-                      style={{
-                        ...itemStyle(isMobile),
-                        display: 'flex',
-                        color: menuText3,
-                        fontSize: isMobile ? 14 : 12,
-                      }}
-                      onMouseOver={e => { if (!isMobile) e.currentTarget.style.background = menuHover; }}
-                      onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
-                      <span style={{ fontSize: isMobile ? 18 : 14, width: isMobile ? 28 : 20, textAlign: 'center' }}>🔒</span>
-                      {t('nav_admin', l)}
-                    </Link>
-                  </div>
-
                   <div style={{ height: 1, background: menuBorder, margin: isMobile ? '8px 0' : 0 }} />
 
                   <div style={{ padding: isMobile ? '8px 0' : '6px 0' }}>
