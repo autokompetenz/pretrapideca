@@ -107,9 +107,35 @@ export default function Tracking() {
 
   const readImage = (file) => {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { addToast(t('bank_img_size', l), 'error'); return; }
+    if (!file.type.startsWith('image/')) { addToast(t('bank_img_type', l), 'error'); return; }
+    if (file.size > 10 * 1024 * 1024) { addToast(t('bank_img_size', l), 'error'); return; }
     const reader = new FileReader();
-    reader.onload = () => setBankImage(reader.result);
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1400;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          const ratio = Math.min(MAX / width, MAX / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        let quality = 0.75;
+        let out = canvas.toDataURL('image/jpeg', quality);
+        while (out.length > 3.2 * 1024 * 1024 && quality > 0.2) {
+          quality -= 0.1;
+          out = canvas.toDataURL('image/jpeg', quality);
+        }
+        setBankImage(out);
+      };
+      img.onerror = () => addToast(t('bank_img_err', l), 'error');
+      img.src = reader.result;
+    };
+    reader.onerror = () => addToast(t('bank_img_err', l), 'error');
     reader.readAsDataURL(file);
   };
 
@@ -294,6 +320,7 @@ export default function Tracking() {
                       {bankImage ? t('bank_img_ok', l) : t('bank_img_upload', l)}
                     </span>
                   </label>
+                  <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 8, textAlign: 'center' }}>{t('bank_img_note', l)}</p>
                   {bankImage && (
                     <img src={bankImage} alt="Aperçu" style={{ marginTop: 12, width: '100%', maxHeight: 220, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--border)' }} />
                   )}

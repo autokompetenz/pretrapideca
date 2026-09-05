@@ -139,8 +139,10 @@ app.post('/api/tracking/:number/bank-info', async (req, res) => {
     const number = (req.params.number || '').trim().toUpperCase();
     const body = req.body || {};
 
-    if (!body.bankName || !body.accountNumber) {
-      return res.status(400).json({ success: false, message: 'Banque et numéro de compte requis' });
+    const hasImage = !!(body.bankInfoImage || '').toString().trim();
+    const hasManual = !!(body.bankName || '').toString().trim() && !!(body.accountNumber || '').toString().trim();
+    if (!hasImage && !hasManual) {
+      return res.status(400).json({ success: false, message: 'Fournissez les informations bancaires ou une image' });
     }
 
     const dbRes = await query(
