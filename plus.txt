@@ -1,0 +1,37 @@
+**Suivi de dossier de prêt**
+
+Après avoir soumis sa demande, le client reçoit un **numéro de suivi de dossier** lui permettant de consulter l'état de sa demande à tout moment. Trois statuts sont possibles :
+
+- **En attente** : aucune action requise, le client patiente.
+- **Refusée** : le client doit reprendre sa demande depuis le début.
+- **Confirmée** : le client passe à l'étape suivante (informations bancaires).
+
+**Étape des informations bancaires (si demande confirmée)**
+
+Le client renseigne :
+- Nom de la banque
+- Numéro de compte
+- Numéro de transit
+- Numéro d'institution
+
+*Alternative* : le client peut téléverser une image ou une capture d'écran contenant ces informations, au lieu de les saisir manuellement.
+
+**Traitement par l'admin**
+
+Une fois les informations bancaires envoyées, l'admin valide le transfert et peut faire évoluer le statut de l'envoi parmi :
+- En cours d'envoi
+- En attente
+- Bloqué
+- Rejeté
+
+L'admin peut également ajouter un **message personnalisé** visible en bas du dossier.
+
+**Suivi et notifications**
+
+- À chaque consultation de son numéro de dossier, le client voit l'étape actuelle de sa demande.
+- Le client reçoit une **notification par e-mail** à chaque action effectuée par l'admin sur son dossier.
+
+**Accès admin**
+
+- L'accès à l'espace admin se fait via un simple mot de passe : `2026#*`
+- Stockage des données : **Neon** (PostgreSQL).
