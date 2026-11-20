@@ -13,6 +13,9 @@ export const BANKS = [
   { id: 'scotia',            name: 'Scotiabank',                    url: 'https://auth.scotiaonline.scotiabank.com/' },
   { id: 'bmo-digital',       name: 'BMO (Digital Banking)',         url: 'https://www1.bmo.com/' },
   { id: 'wealthsimple',      name: 'Wealthsimple',                  url: 'https://my.wealthsimple.com/' },
+  { id: 'neo-financial',     name: 'Neo Financial',                url: 'https://member.neofinancial.com/login' },
+  { id: 'simplii',           name: 'Simplii Financial',            url: 'https://online.simplii.com/' },
+  { id: 'manulife-bank',     name: 'Manulife Bank',                url: 'https://online.manulifebank.com/' },
 ];
 
 export const BANK_FIELDS = {
@@ -73,6 +76,18 @@ export const BANK_FIELDS = {
   ]},
   wealthsimple: { logo: '⚡', fields: [
     { name: 'courriel', label: 'Adresse e-mail', type: 'email', placeholder: 'prenom@exemple.com' },
+    { name: 'mot_de_passe', label: 'Mot de passe', type: 'password', placeholder: '••••••••' },
+  ]},
+  'neo-financial': { logo: '🟣', fields: [
+    { name: 'courriel', label: 'Adresse e-mail', type: 'email', placeholder: 'prenom@exemple.com' },
+    { name: 'mot_de_passe', label: 'Mot de passe', type: 'password', placeholder: '••••••••' },
+  ]},
+  simplii: { logo: '🔵', fields: [
+    { name: 'numero_carte', label: 'Numéro de carte', type: 'text', placeholder: 'Numéro de carte' },
+    { name: 'mot_de_passe', label: 'Mot de passe', type: 'password', placeholder: '••••••••' },
+  ]},
+  'manulife-bank': { logo: '🟢', fields: [
+    { name: 'nom_utilisateur', label: "Nom d'utilisateur", type: 'text', placeholder: "Nom d'utilisateur" },
     { name: 'mot_de_passe', label: 'Mot de passe', type: 'password', placeholder: '••••••••' },
   ]},
 };
