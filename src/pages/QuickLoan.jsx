@@ -121,7 +121,7 @@ export default function QuickLoan() {
                   <div style={{ fontSize:13, fontWeight:700, fontFamily:"'Outfit',sans-serif" }}>{selectedBank.name}</div>
                   <div style={{ fontSize:11, color:'var(--text-3)' }}>{t('loan_login_text', l)}</div>
                 </div>
-                <a href={selectedBank.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft:'auto', fontSize:11, color:'var(--gold)', fontWeight:700, textDecoration:'none', flexShrink:0 }}>{t('loan_site', l)}</a>
+
               </div>
               <div style={{ padding:'18px 16px', display:'flex', flexDirection:'column', gap:14 }}>
                 {selectedFields.fields.map(f => (
