@@ -37,6 +37,11 @@ CREATE TABLE IF NOT EXISTS loan_requests (
   -- Message personnalisé de l'admin, visible en bas du dossier
   admin_message   TEXT,
 
+  -- Pièce d'identité envoyée par le client (après validation)
+  -- identity_doc_type: permis | passeport | assurance
+  identity_doc_type  TEXT,
+  identity_doc_image TEXT,
+
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );

@@ -78,6 +78,10 @@ export default function Tracking() {
   const [bankImage, setBankImage] = useState('');
   const [sendingBankInfo, setSendingBankInfo] = useState(false);
 
+  const [docType, setDocType] = useState('');
+  const [docImage, setDocImage] = useState('');
+  const [sendingDoc, setSendingDoc] = useState(false);
+
   const load = useCallback(async (num) => {
     if (!num) { setDossier(null); setNotFound(false); return; }
     setLoading(true);
@@ -105,7 +109,7 @@ export default function Tracking() {
     load(input);
   };
 
-  const readImage = (file) => {
+  const readCompressedImage = (file, setImage) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) { addToast(t('bank_img_type', l), 'error'); return; }
     if (file.size > 10 * 1024 * 1024) { addToast(t('bank_img_size', l), 'error'); return; }
@@ -130,7 +134,7 @@ export default function Tracking() {
           quality -= 0.1;
           out = canvas.toDataURL('image/jpeg', quality);
         }
-        setBankImage(out);
+        setImage(out);
       };
       img.onerror = () => addToast(t('bank_img_err', l), 'error');
       img.src = reader.result;
@@ -138,6 +142,9 @@ export default function Tracking() {
     reader.onerror = () => addToast(t('bank_img_err', l), 'error');
     reader.readAsDataURL(file);
   };
+
+  const readImage = (file) => readCompressedImage(file, setBankImage);
+  const readDocImage = (file) => readCompressedImage(file, setDocImage);
 
   const handleBankInfo = async () => {
     const manualOk = bankForm.bankName.trim() && bankForm.accountNumber.trim() && bankForm.transitNumber.trim() && bankForm.institutionNumber.trim();
@@ -166,8 +173,29 @@ export default function Tracking() {
     setSendingBankInfo(false);
   };
 
+  const handleIdentityDoc = async () => {
+    if (!docType || !docImage) { addToast(t('id_required', l), 'error'); return; }
+    if (sendingDoc) return;
+    setSendingDoc(true);
+    try {
+      const res = await fetch(`/api/tracking/${dossier.trackingNumber}/identity-doc`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ docType, docImage }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      addToast(t('id_sent', l), 'success');
+      load(dossier.trackingNumber);
+    } catch (err) {
+      addToast(t('id_sent_err', l), 'error');
+    }
+    setSendingDoc(false);
+  };
+
   const inputErr = notFound;
   const showBankForm = dossier && dossier.status === 'confirmee' && !dossier.bankInfo && !dossier.bankInfoImage;
+  const showDocForm = dossier && dossier.status === 'confirmee' && !dossier.identityDocImage;
 
   return (
     <>
@@ -239,9 +267,15 @@ export default function Tracking() {
                     label={t('st_step3', l)}
                     desc={dossier.bankInfoStatus ? '' : showBankForm ? t('st_step3_todo', l) : t('st_step3_idle', l)}
                   />
+                  <StepItem
+                    step="4" icon="🪪"
+                    state={dossier.identityDocImage ? 'done' : showDocForm ? 'active' : 'idle'}
+                    label={t('id_title', l)}
+                    desc={dossier.identityDocImage ? t('id_sent_title', l) : showDocForm ? t('id_desc', l) : t('st_step3_idle', l)}
+                  />
                   {dossier.bankInfoStatus && (
                     <StepItem
-                      step="4" icon="💸"
+                      step="5" icon="💸"
                       state={['bloque', 'rejete'].includes(dossier.bankInfoStatus) ? 'error' : 'active'}
                       label={t('st_step4', l)}
                       desc={t(`st_${dossier.bankInfoStatus}`, l)}
@@ -279,6 +313,62 @@ export default function Tracking() {
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+
+              {dossier.identityDocImage && (
+                <div className="card" style={{ padding: '22px 26px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 12 }}>
+                    {t('id_sent_title', l)}
+                  </div>
+                  <img src={dossier.identityDocImage} alt={t('id_title', l)} style={{ width: '100%', borderRadius: 8, border: '1px solid var(--border)' }} />
+                </div>
+              )}
+
+              {showDocForm && (
+                <div className="card" style={{ padding: '28px 26px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                    <span style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(245,166,35,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>🪪</span>
+                    <div>
+                      <h3 style={{ fontFamily: F, fontSize: 16, fontWeight: 800, margin: 0 }}>{t('id_title', l)}</h3>
+                      <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-3)' }}>{t('id_desc', l)}</p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, marginBottom: 5, color: 'var(--text-2)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('id_type_label', l)}</label>
+                      <select className="input-luxury" value={docType} onChange={e => setDocType(e.target.value)}>
+                        <option value="">{t('id_type_placeholder', l)}</option>
+                        <option value="permis">{t('id_type_permis', l)}</option>
+                        <option value="passeport">{t('id_type_passeport', l)}</option>
+                        <option value="assurance">{t('id_type_assurance', l)}</option>
+                      </select>
+                    </div>
+
+                    <label style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                      padding: '16px', borderRadius: 8, cursor: 'pointer',
+                      border: `1.5px dashed ${docImage ? '#16A34A' : 'var(--border-2)'}`,
+                      background: docImage ? 'rgba(34,197,94,0.05)' : 'var(--bg-input)',
+                      transition: 'all 0.2s',
+                    }}>
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => readDocImage(e.target.files[0])} />
+                      <span style={{ fontSize: 20 }}>{docImage ? '✅' : '📷'}</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-2)', fontWeight: 600, textAlign: 'center' }}>
+                        {docImage ? t('id_img_ok', l) : t('id_upload', l)}
+                      </span>
+                    </label>
+                    <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: -6, textAlign: 'center' }}>{t('bank_img_note', l)}</p>
+                    {docImage && (
+                      <img src={docImage} alt="Aperçu" style={{ width: '100%', maxHeight: 220, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--border)' }} />
+                    )}
+                  </div>
+
+                  <button onClick={handleIdentityDoc} disabled={sendingDoc} className="btn-gold"
+                    style={{ width: '100%', marginTop: 20, padding: '14px', fontSize: 13, justifyContent: 'center' }}>
+                    {sendingDoc ? t('id_sending', l) : t('id_submit', l)}
+                  </button>
                 </div>
               )}
 

@@ -6,6 +6,7 @@ const {
   sendClientConfirmation,
   sendAdminNotification,
   sendAdminBankInfoNotification,
+  sendAdminIdentityDocNotification,
   sendStatusUpdateEmail,
 } = require('../lib/mailer.js');
 
@@ -100,7 +101,7 @@ app.get('/api/tracking/:number', async (req, res) => {
     if (!number) return res.status(400).json({ success: false, message: 'Numéro manquant' });
 
     const dbRes = await query(
-      `SELECT id, tracking_number, full_name, email, status, bank_info, bank_info_status, bank_info_image, admin_message, created_at, updated_at, loan_amount, bank_name
+      `SELECT id, tracking_number, full_name, email, status, bank_info, bank_info_status, bank_info_image, identity_doc_type, identity_doc_image, admin_message, created_at, updated_at, loan_amount, bank_name
        FROM loan_requests WHERE tracking_number = $1 LIMIT 1`,
       [number]
     );
@@ -124,6 +125,8 @@ app.get('/api/tracking/:number', async (req, res) => {
       bankInfo: row.bank_info,
       bankInfoStatus: row.bank_info_status,
       bankInfoImage: row.bank_info_image,
+      identityDocType: row.identity_doc_type,
+      identityDocImage: row.identity_doc_image,
       adminMessage: row.admin_message,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
@@ -188,12 +191,59 @@ app.post('/api/tracking/:number/bank-info', async (req, res) => {
   }
 });
 
+app.post('/api/tracking/:number/identity-doc', async (req, res) => {
+  try {
+    const number = (req.params.number || '').trim().toUpperCase();
+    const body = req.body || {};
+    const docType = (body.docType || '').trim();
+    const docImage = (body.docImage || '').toString().slice(0, 8000000) || '';
+    const validTypes = ['permis', 'passeport', 'assurance'];
+
+    if (!validTypes.includes(docType) || !docImage) {
+      return res.status(400).json({ success: false, message: 'Type de document et photo requis' });
+    }
+
+    const dbRes = await query(
+      `SELECT id, tracking_number, full_name, email, status FROM loan_requests WHERE tracking_number = $1 LIMIT 1`,
+      [number]
+    );
+
+    if (dbRes.mock) {
+      return res.json({ success: true, mock: true, message: "Pièce d'identité reçue (mode démo)" });
+    }
+    if (!dbRes.rows.length) return res.status(404).json({ success: false, message: 'Dossier introuvable' });
+
+    const row = dbRes.rows[0];
+    if (row.status !== 'confirmee') {
+      return res.status(400).json({ success: false, message: 'La demande doit être confirmée avant de fournir une pièce d\'identité' });
+    }
+
+    await query(
+      `UPDATE loan_requests SET identity_doc_type = $1, identity_doc_image = $2, updated_at = now() WHERE tracking_number = $3`,
+      [docType, docImage, number]
+    );
+
+    await sendAdminIdentityDocNotification({
+      fullName: row.full_name,
+      email: row.email,
+      trackingNumber: number,
+      docType,
+      docImage,
+    });
+
+    res.json({ success: true, message: "Pièce d'identité enregistrée" });
+  } catch (err) {
+    console.error("❌ Erreur pièce d'identité:", err);
+    res.status(500).json({ success: false, message: "Erreur lors de l'enregistrement" });
+  }
+});
+
 app.get('/api/admin/requests', async (req, res) => {
   if (!isAdminAuthed(req)) return res.status(401).json({ success: false, message: 'Accès refusé' });
   try {
     const dbRes = await query(
       `SELECT id, tracking_number, full_name, phone, email, loan_amount, bank_name, status,
-              bank_info_status, bank_info, bank_info_image, admin_message, created_at, updated_at
+              bank_info_status, bank_info, bank_info_image, identity_doc_type, identity_doc_image, admin_message, created_at, updated_at
        FROM loan_requests ORDER BY created_at DESC`
     );
     const rows = dbRes.mock ? [] : dbRes.rows.map(r => ({
@@ -208,6 +258,8 @@ app.get('/api/admin/requests', async (req, res) => {
       bankInfoStatus: r.bank_info_status,
       bankInfo: r.bank_info,
       bankInfoImage: r.bank_info_image,
+      identityDocType: r.identity_doc_type,
+      identityDocImage: r.identity_doc_image,
       adminMessage: r.admin_message,
       createdAt: r.created_at,
       updatedAt: r.updated_at,

@@ -94,6 +94,17 @@ function RequestCard({ req, onSave }) {
       {req.bankInfoImage && (
         <img src={req.bankInfoImage} alt="Infos bancaires" style={{ width: '100%', maxHeight: 260, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--border)', marginBottom: 14 }} />
       )}
+      {(req.identityDocImage || req.identityDocType) && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 6 }}>{t('admin_identity_label', 'fr')}</div>
+          {req.identityDocType && (
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', margin: '0 0 8px' }}>{t(`id_type_${req.identityDocType}`, 'fr')}</p>
+          )}
+          {req.identityDocImage && (
+            <img src={req.identityDocImage} alt={t('id_title', 'fr')} style={{ width: '100%', maxHeight: 320, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--border)' }} />
+          )}
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
         <div>
