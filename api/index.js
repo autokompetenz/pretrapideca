@@ -12,7 +12,7 @@ const {
 
 const app = express();
 
-app.use(cors({ origin: ['https://pret-rapide.vercel.app', 'http://localhost:5173', 'http://localhost:3000'] }));
+app.use(cors({ origin: ['https://www.pretrapideca.com', 'https://pretrapideca.com', 'https://pret-rapide.vercel.app', 'http://localhost:5173', 'http://localhost:3000'] }));
 app.use(express.json({ limit: '10mb' }));
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '2026#*';
